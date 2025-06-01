@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:liverify_disease_detection/custom_widgets/custom_button.dart';
 import 'package:liverify_disease_detection/res/my_colors.dart';
 import 'package:liverify_disease_detection/screens/home_screen/prediction_service.dart';
-import 'package:liverify_disease_detection/screens/profile_screen/profile_screen.dart';
-import 'package:liverify_disease_detection/utils/utils.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

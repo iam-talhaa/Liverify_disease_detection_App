@@ -60,6 +60,7 @@ class _Navigation_BarState extends State<Navigation_Bar> {
       bottomNavigationBar: NavigationBar(
         height: 54.h,
         onDestinationSelected: (int index) {
+          print("Nothing");
           setState(() {
             currentPageIndex = index;
           });
