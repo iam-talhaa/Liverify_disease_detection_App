@@ -16,6 +16,7 @@ class NormalText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('');
     return Text(
       '$t_string',
       style: TextStyle(
