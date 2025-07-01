@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final Map<String, dynamic> inputData = {};
 
   final fields = {
-    'Age': TextInputType.number,
+    'Age Testing': TextInputType.number,
     'Gender': TextInputType.number,
     'BMI': TextInputType.number,
     'AlcoholConsumption': TextInputType.number,
@@ -185,39 +185,44 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 10),
 
-              Container(
-                height: 100.h,
-                width: double.infinity.w,
+              Center(
+                child:
+                    result == ''
+                        ? null
+                        : Container(
+                          height: 100.h,
+                          width: double.infinity.w,
 
-                decoration: BoxDecoration(color: LightBlue),
-                child: Row(
-                  children: [
-                    SizedBox(width: 10),
-                    // Text(
-                    //   'Prediction: $result',
-                    //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    // ),
-                    Image(
-                      height: 80,
-                      image: AssetImage(
-                        result == 'Disease Detected'
-                            ? 'assets/warning.png'
-                            : 'assets/check.png',
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      result == 'Disease Detected'
-                          ? " Non-Alcholic-Fatty\n Liver Disease Detected"
-                          : "No Liver Disease",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                          decoration: BoxDecoration(color: LightBlue),
+                          child: Row(
+                            children: [
+                              SizedBox(width: 10),
+                              // Text(
+                              //   'Prediction: $result',
+                              //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                              // ),
+                              Image(
+                                height: 80,
+                                image: AssetImage(
+                                  result == 'Disease Detected'
+                                      ? 'assets/warning.png'
+                                      : 'assets/check.png',
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                result == 'Disease Detected'
+                                    ? " Non-Alcholic-Fatty\n Liver Disease Detected"
+                                    : "No Liver Disease",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
 
-                        fontSize: 20,
-                      ),
-                    ),
-                  ],
-                ),
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
               ),
             ],
           ),
