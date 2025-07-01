@@ -4,7 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:liverify_disease_detection/res/my_colors.dart';
 import 'package:liverify_disease_detection/screens/Ai_chatbot/generative_text_view.dart';
 import 'package:liverify_disease_detection/screens/home_screen/Home_screen.dart';
-import 'package:liverify_disease_detection/screens/profile_screen/Profile_screen.dart';
+
+import 'package:liverify_disease_detection/screens/profile_screen/profile_screen.dart';
 import 'package:liverify_disease_detection/screens/splash_screen/splashScreen.dart';
 
 void main() {
@@ -93,7 +94,7 @@ class _Navigation_BarState extends State<Navigation_Bar> {
             ChatView(),
 
             /// Messages page
-            Profile_screen(),
+            ProfileScreen(),
           ][currentPageIndex],
     );
   }

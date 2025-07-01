@@ -5,8 +5,77 @@ import 'package:liverify_disease_detection/res/my_colors.dart';
 
 import '../home_screen/prediction_service.dart';
 
-class Profile_screen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   final service = PredictionService();
+
+  String name = 'Muhammad Talha';
+  String email = 'tahakhan4141@gmail.com';
+
+  void editProfile() {
+    final nameController = TextEditingController(text: name);
+    final emailController = TextEditingController(text: email);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Edit Profile",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: emailController,
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    name = nameController.text.trim();
+                    email = emailController.text.trim();
+                  });
+                  Navigator.pop(context);
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +88,9 @@ class Profile_screen extends StatelessWidget {
         child: FutureBuilder<Map<String, double>>(
           future: service.loadInputs(),
           builder: (context, snapshot) {
-            if (!snapshot.hasData)
-              return Center(child: CircularProgressIndicator());
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
             final data = snapshot.data!;
             return Column(
@@ -29,10 +99,9 @@ class Profile_screen extends StatelessWidget {
                 Container(
                   height: 150.h,
                   width: double.infinity.w,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.teal,
                     borderRadius: BorderRadius.only(
-                      // bottomLeft: Radius.circular(40),
                       bottomRight: Radius.circular(100),
                     ),
                   ),
@@ -43,67 +112,64 @@ class Profile_screen extends StatelessWidget {
                         child: CircleAvatar(
                           backgroundColor: whiteColor,
                           radius: 40.h,
-                          // child: Icon(Icons.person_off_rounded, size: 40),
-                          backgroundImage: AssetImage('assets/user.png'),
+                          backgroundImage: const AssetImage('assets/user.png'),
                         ),
                       ),
-                      SizedBox(width: 10),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Muhammad Talha',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                              color: whiteColor,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              name,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500,
+                                color: whiteColor,
+                              ),
                             ),
-                          ),
-                          Text(
-                            'tahakhan4141@gmail.com',
-                            style: TextStyle(fontSize: 14, color: whiteColor),
-                          ),
-                        ],
+                            Text(
+                              email,
+                              style: const TextStyle(fontSize: 14, color: whiteColor),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.white),
+                        onPressed: editProfile,
                       ),
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
+                const Padding(
+                  padding: EdgeInsets.only(left: 10, top: 15),
                   child: Text(
                     "Record",
-
                     style: TextStyle(
                       fontFamily: "PlayfairDisplay-VariableFont_wght",
                       fontSize: 30,
-
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
-                Divider(),
+                const Divider(),
                 Container(
                   height: 400,
                   width: double.infinity,
                   child: ListView(
-                    children:
-                        data.entries.map((entry) {
-                          return Container(
-                            child: Column(
-                              children: [
-                                ListTile(
-                                  minTileHeight: 2,
-                                  title: Text(entry.key),
-                                  trailing: Text(
-                                    entry.value.toStringAsFixed(2),
-                                  ),
-                                ),
-                                Divider(height: 0, thickness: 2),
-                              ],
-                            ),
-                          );
-                        }).toList(),
+                    children: data.entries.map((entry) {
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text(entry.key),
+                            trailing: Text(entry.value.toStringAsFixed(2)),
+                          ),
+                          const Divider(height: 0, thickness: 2),
+                        ],
+                      );
+                    }).toList(),
                   ),
                 ),
               ],
