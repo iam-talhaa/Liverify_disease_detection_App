@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:liverify_disease_detection/custom_widgets/custom_button.dart';
 import 'package:liverify_disease_detection/res/my_colors.dart';
 
@@ -87,6 +90,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  File? _selectedImage;
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     void closeAppUsingSystemPop() {
@@ -119,10 +135,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(left: 10),
-                        child: CircleAvatar(
-                          backgroundColor: whiteColor,
-                          radius: 40.h,
-                          backgroundImage: const AssetImage('assets/user.png'),
+                        child: GestureDetector(
+                          onTap: _pickImage,
+                          child: Container(
+                            width: 90,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.grey.shade300,
+                                width: 2,
+                              ),
+                              image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image:
+                                    _selectedImage != null
+                                        ? FileImage(_selectedImage!)
+                                        : const AssetImage('assets/user.png')
+                                            as ImageProvider,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 10),

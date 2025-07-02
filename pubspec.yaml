@@ -41,6 +41,7 @@ dependencies:
   flutter_riverpod: ^2.6.1
   google_generative_ai: ^0.4.7
   image_picker: ^1.1.2
+  
 
 dev_dependencies:
   flutter_test:
