@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:liverify_disease_detection/custom_widgets/custom_button.dart';
 import 'package:liverify_disease_detection/res/my_colors.dart';
 
 import '../home_screen/prediction_service.dart';
@@ -46,29 +47,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 10),
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Name',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.teal, width: 2),
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: emailController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Email',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.teal, width: 2),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
+              C_button(
+                name: "Save",
+                B_color: Colors.teal,
+                ontap: () {
                   setState(() {
                     name = nameController.text.trim();
                     email = emailController.text.trim();
                   });
                   Navigator.pop(context);
                 },
-                child: const Text('Save'),
+                b_Width: 130.0,
+                b_height: 45.0,
               ),
             ],
           ),
@@ -131,7 +141,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             Text(
                               email,
-                              style: const TextStyle(fontSize: 14, color: whiteColor),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: whiteColor,
+                              ),
                             ),
                           ],
                         ),
@@ -159,17 +172,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   height: 400,
                   width: double.infinity,
                   child: ListView(
-                    children: data.entries.map((entry) {
-                      return Column(
-                        children: [
-                          ListTile(
-                            title: Text(entry.key),
-                            trailing: Text(entry.value.toStringAsFixed(2)),
-                          ),
-                          const Divider(height: 0, thickness: 2),
-                        ],
-                      );
-                    }).toList(),
+                    children:
+                        data.entries.map((entry) {
+                          return Column(
+                            children: [
+                              ListTile(
+                                title: Text(entry.key),
+                                trailing: Text(entry.value.toStringAsFixed(2)),
+                              ),
+                              const Divider(height: 0, thickness: 2),
+                            ],
+                          );
+                        }).toList(),
                   ),
                 ),
               ],

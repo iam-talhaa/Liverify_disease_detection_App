@@ -3,29 +3,42 @@ import 'package:tflite_flutter/tflite_flutter.dart';
 
 class PredictionService {
   Future<double> predict(Map<String, dynamic> inputData) async {
-    Future<void> saveInputs(Map<String, dynamic> data) async {
-      final prefs = await SharedPreferences.getInstance();
-      for (var entry in data.entries) {
-        prefs.setDouble(entry.key, entry.value);
-      }
+    // Normalize field names (e.g. 'Age Testing' -> 'Age')
+    final normalizedInput = {
+      'Age': inputData['Age Testing'] ?? inputData['Age'] ?? 0.0,
+      'Gender': inputData['Gender'] ?? 0.0,
+      'BMI': inputData['BMI'] ?? 0.0,
+      'AlcoholConsumption': inputData['AlcoholConsumption'] ?? 0.0,
+      'Smoking': inputData['Smoking'] ?? 0.0,
+      'GeneticRisk': inputData['GeneticRisk'] ?? 0.0,
+      'PhysicalActivity': inputData['PhysicalActivity'] ?? 0.0,
+      'Diabetes': inputData['Diabetes'] ?? 0.0,
+      'Hypertension': inputData['Hypertension'] ?? 0.0,
+      'LiverFunctionTest': inputData['LiverFunctionTest'] ?? 0.0,
+    };
+
+    // Save inputs to SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    for (var entry in normalizedInput.entries) {
+      prefs.setDouble(entry.key, entry.value);
     }
 
-    await saveInputs(inputData);
+    // Load TFLite model
     final interpreter = await Interpreter.fromAsset('assets/ann_model.tflite');
 
-    // Prepare input in the required format: 1x10 matrix
+    // Normalize input values
     final input = [
       [
-        (inputData['Age'] - 50.39) / 17.64,
-        (inputData['Gender'] - 0.50) / 0.50,
-        (inputData['BMI'] - 27.70) / 7.21,
-        (inputData['AlcoholConsumption'] - 9.83) / 5.76,
-        (inputData['Smoking'] - 0.29) / 0.45,
-        (inputData['GeneticRisk'] - 0.52) / 0.67,
-        (inputData['PhysicalActivity'] - 5.00) / 2.85,
-        (inputData['Diabetes'] - 0.14) / 0.35,
-        (inputData['Hypertension'] - 0.15) / 0.36,
-        (inputData['LiverFunctionTest'] - 59.86) / 22.99,
+        (normalizedInput['Age']! - 50.39) / 17.64,
+        (normalizedInput['Gender']! - 0.50) / 0.50,
+        (normalizedInput['BMI']! - 27.70) / 7.21,
+        (normalizedInput['AlcoholConsumption']! - 9.83) / 5.76,
+        (normalizedInput['Smoking']! - 0.29) / 0.45,
+        (normalizedInput['GeneticRisk']! - 0.52) / 0.67,
+        (normalizedInput['PhysicalActivity']! - 5.00) / 2.85,
+        (normalizedInput['Diabetes']! - 0.14) / 0.35,
+        (normalizedInput['Hypertension']! - 0.15) / 0.36,
+        (normalizedInput['LiverFunctionTest']! - 59.86) / 22.99,
       ],
     ];
 

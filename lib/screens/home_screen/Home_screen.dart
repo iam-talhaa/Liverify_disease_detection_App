@@ -12,6 +12,48 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final Map<String, TextEditingController> controllers = {};
+  final Map<String, dynamic> inputData = {};
+  String result = '';
+  final Map<String, Map<String, dynamic>> fields = {
+    'Age Testing': {'type': TextInputType.number, 'icon': Icons.calendar_today},
+    'Gender': {'type': TextInputType.number, 'icon': Icons.person},
+    'BMI': {'type': TextInputType.number, 'icon': Icons.fitness_center},
+    'AlcoholConsumption': {
+      'type': TextInputType.number,
+      'icon': Icons.wine_bar,
+    },
+    'Smoking': {'type': TextInputType.number, 'icon': Icons.smoking_rooms},
+    'GeneticRisk': {
+      'type': TextInputType.number,
+      'icon': Icons.family_restroom,
+    },
+    'PhysicalActivity': {
+      'type': TextInputType.number,
+      'icon': Icons.directions_run,
+    },
+    'Diabetes': {'type': TextInputType.number, 'icon': Icons.bloodtype},
+    'Hypertension': {'type': TextInputType.number, 'icon': Icons.favorite},
+    'LiverFunctionTest': {'type': TextInputType.number, 'icon': Icons.science},
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    for (var key in fields.keys) {
+      controllers[key] = TextEditingController();
+    }
+  }
+
+  @override
+  void dispose() {
+    for (var controller in controllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
   void _showAlertDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -38,22 +80,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          content:
+          content: Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: Text(
               result == "No Disease"
-                  ? Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: Text(
-                      "No Liver Disease Detected",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  )
-                  : Text(
-                    "Non-Alchoholic Fatty Liver Disease Detected",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
+                  ? "No Liver Disease Detected"
+                  : "Non-Alchoholic Fatty Liver Disease Detected",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+          ),
           actions: [
             TextButton(
               child: Text('Cancel'),
@@ -66,25 +101,13 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-  // Save data to SharedPreferences
 
-  final _formKey = GlobalKey<FormState>();
-  final Map<String, dynamic> inputData = {};
+  void _clearAllFields() {
+    controllers.forEach((key, controller) {
+      controller.clear();
+    });
+  }
 
-  final fields = {
-    'Age Testing': TextInputType.number,
-    'Gender': TextInputType.number,
-    'BMI': TextInputType.number,
-    'AlcoholConsumption': TextInputType.number,
-    'Smoking': TextInputType.number,
-    'GeneticRisk': TextInputType.number,
-    'PhysicalActivity': TextInputType.number,
-    'Diabetes': TextInputType.number,
-    'Hypertension': TextInputType.number,
-    'LiverFunctionTest': TextInputType.number,
-  };
-
-  String result = '';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,7 +116,6 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Row(
           children: [
             Image(height: 37, image: AssetImage('assets/liver_logo.png')),
-
             Text(
               'Liverify',
               style: TextStyle(
@@ -120,14 +142,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     horizontal: 20,
                   ),
                   child: TextFormField(
+                    controller: controllers[e.key],
                     validator: (myvale) {
                       if (myvale == null || myvale.isEmpty) {
                         return "This is Required";
                       }
-                      null;
+                      return null;
                     },
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.biotech, color: Colors.deepPurple),
+                      prefixIcon: Icon(
+                        e.value['icon'] as IconData,
+                        color: Colors.deepPurple,
+                      ),
                       filled: true,
                       fillColor: Color(0xffEAEFEF),
                       labelStyle: TextStyle(
@@ -145,17 +171,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: 4,
                         ),
                       ),
-
                       hintStyle: TextStyle(color: Colors.purple.shade200),
                       labelText: e.key,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    keyboardType: e.value,
-                    onSaved:
-                        (val) =>
-                            inputData[e.key] = double.tryParse(val ?? '0') ?? 0,
+                    keyboardType: e.value['type'],
                   ),
                 ),
               ),
@@ -166,41 +188,45 @@ class _HomeScreenState extends State<HomeScreen> {
                   name: "Detect",
                   B_color: Colors.teal,
                   ontap: () async {
-                    _formKey.currentState?.save();
-                    final prediction = await PredictionService().predict(
-                      inputData,
-                    );
+                    if (_formKey.currentState!.validate()) {
+                      // Save and convert inputs
+                      inputData.clear();
+                      controllers.forEach((key, controller) {
+                        inputData[key] =
+                            double.tryParse(controller.text.trim()) ?? 0.0;
+                      });
 
-                    setState(() {
-                      _showAlertDialog(context);
-                      result =
-                          prediction > 0.5 ? 'Disease Detected' : 'No Disease';
-                    });
+                      final prediction = await PredictionService().predict(
+                        inputData,
+                      );
 
-                    // _formKey.currentState?.save();
+                      setState(() {
+                        result =
+                            prediction > 0.5
+                                ? 'Disease Detected'
+                                : 'No Disease';
+                        _showAlertDialog(context);
+                      });
+
+                      _clearAllFields(); // Clear fields after prediction
+                    }
                   },
                   b_Width: 100.0.w,
                   b_height: 45.0.h,
                 ),
               ),
               SizedBox(height: 10),
-
               Center(
                 child:
                     result == ''
                         ? null
                         : Container(
                           height: 100.h,
-                          width: double.infinity.w,
-
+                          width: double.infinity,
                           decoration: BoxDecoration(color: LightBlue),
                           child: Row(
                             children: [
                               SizedBox(width: 10),
-                              // Text(
-                              //   'Prediction: $result',
-                              //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                              // ),
                               Image(
                                 height: 80,
                                 image: AssetImage(
@@ -216,7 +242,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                     : "No Liver Disease",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-
                                   fontSize: 20,
                                 ),
                               ),

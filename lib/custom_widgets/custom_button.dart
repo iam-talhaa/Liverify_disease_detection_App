@@ -37,7 +37,11 @@ class _C_buttonState extends State<C_button> {
           child: Center(
             child: Text(
               widget.name,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
           ),
         ),
