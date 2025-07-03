@@ -16,6 +16,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final Map<String, TextEditingController> controllers = {};
   final Map<String, dynamic> inputData = {};
   String result = '';
+  double? _probability; // NEW
+
   final Map<String, Map<String, dynamic>> fields = {
     'Age Testing': {'type': TextInputType.number, 'icon': Icons.calendar_today},
     'Gender': {'type': TextInputType.number, 'icon': Icons.person},
@@ -82,18 +84,36 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           content: Padding(
             padding: const EdgeInsets.only(left: 10),
-            child: Text(
-              result == "No Disease"
-                  ? "No Liver Disease Detected"
-                  : "Non-Alchoholic Fatty Liver Disease Detected",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  result == "No Disease"
+                      ? "No Liver Disease Detected"
+                      : "Non-Alchoholic Fatty Liver Disease Detected",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                if (_probability != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Text(
+                      'Probability: ${(_probability! * 100).toStringAsFixed(2)}%',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.deepPurple,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
           actions: [
             TextButton(
               child: Text('Cancel'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -189,7 +209,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   B_color: Colors.teal,
                   ontap: () async {
                     if (_formKey.currentState!.validate()) {
-                      // Save and convert inputs
                       inputData.clear();
                       controllers.forEach((key, controller) {
                         inputData[key] =
@@ -205,10 +224,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             prediction > 0.5
                                 ? 'Disease Detected'
                                 : 'No Disease';
+                        _probability = prediction;
                         _showAlertDialog(context);
                       });
 
-                      _clearAllFields(); // Clear fields after prediction
+                      _clearAllFields();
                     }
                   },
                   b_Width: 100.0.w,
@@ -221,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     result == ''
                         ? null
                         : Container(
-                          height: 100.h,
+                          height: 140.h,
                           width: double.infinity,
                           decoration: BoxDecoration(color: LightBlue),
                           child: Row(
@@ -236,15 +256,52 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               SizedBox(width: 10),
-                              Text(
-                                result == 'Disease Detected'
-                                    ? " Non-Alcholic-Fatty\n Liver Disease Detected"
-                                    : "No Liver Disease",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      result == 'Disease Detected'
+                                          ? "Non-Alcholic-Fatty\nLiver Disease Detected"
+                                          : "No Liver Disease",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 17,
+                                      ),
+                                    ),
+                                    if (_probability != null) ...[
+                                      SizedBox(height: 8),
+                                      Text(
+                                        'Probability: ${(_probability! * 100).toStringAsFixed(2)}%',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.deepPurple,
+                                        ),
+                                      ),
+                                      SizedBox(height: 6),
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: LinearProgressIndicator(
+                                          minHeight: 10,
+                                          value: _probability!,
+                                          backgroundColor: Colors.grey.shade300,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                _probability! > 0.7
+                                                    ? Colors.red
+                                                    : _probability! > 0.3
+                                                    ? Colors.orange
+                                                    : Colors.green,
+                                              ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
                                 ),
                               ),
+                              SizedBox(width: 10),
                             ],
                           ),
                         ),

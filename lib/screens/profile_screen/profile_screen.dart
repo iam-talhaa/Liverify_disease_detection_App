@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:liverify_disease_detection/custom_widgets/custom_button.dart';
 import 'package:liverify_disease_detection/res/my_colors.dart';
+import 'package:collection/collection.dart';
 
 import '../home_screen/prediction_service.dart';
 
@@ -123,29 +124,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  height: 150.h,
-                  width: double.infinity.w,
-                  decoration: const BoxDecoration(
-                    color: Colors.teal,
-                    borderRadius: BorderRadius.only(
-                      bottomRight: Radius.circular(100),
+                  height: 170.h,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF008080), Color(0xFF20B2AA)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      bottomRight: Radius.circular(90),
+                      bottomLeft: Radius.circular(10),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.teal.withOpacity(0.4),
+                        blurRadius: 15,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 1.5,
                     ),
                   ),
                   child: Row(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 10),
+                        padding: const EdgeInsets.only(left: 20),
                         child: GestureDetector(
                           onTap: _pickImage,
                           child: Container(
-                            width: 90,
-                            height: 100,
+                            width: 80,
+                            height: 80,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.grey.shade300,
-                                width: 2,
+                              gradient: const LinearGradient(
+                                colors: [Colors.white, Colors.grey],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
+                              border: Border.all(color: Colors.white, width: 3),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.tealAccent.withOpacity(0.6),
+                                  blurRadius: 20,
+                                  spreadRadius: 1,
+                                ),
+                              ],
                               image: DecorationImage(
                                 fit: BoxFit.cover,
                                 image:
@@ -158,7 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 20),
                       Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -166,29 +192,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             Text(
                               name,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                                color: whiteColor,
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                shadows: const [
+                                  Shadow(
+                                    offset: Offset(1, 1),
+                                    blurRadius: 2,
+                                    color: Colors.black45,
+                                  ),
+                                ],
                               ),
                             ),
+                            const SizedBox(height: 6),
                             Text(
                               email,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: whiteColor,
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                color: Colors.white70,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.white),
-                        onPressed: editProfile,
+                      Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.white),
+                          onPressed: editProfile,
+                        ),
                       ),
                     ],
                   ),
                 ),
+
                 const Padding(
                   padding: EdgeInsets.only(left: 10, top: 15),
                   child: Text(
@@ -202,21 +240,84 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const Divider(),
                 Container(
-                  height: 400,
                   width: double.infinity,
-                  child: ListView(
-                    children:
-                        data.entries.map((entry) {
-                          return Column(
-                            children: [
-                              ListTile(
-                                title: Text(entry.key),
-                                trailing: Text(entry.value.toStringAsFixed(2)),
+                  padding: const EdgeInsets.all(16),
+                  child: Card(
+                    elevation: 6,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    color: Colors.teal.shade50,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: const [
+                              Icon(Icons.person, color: Colors.teal, size: 28),
+                              SizedBox(width: 8),
+                              Text(
+                                'Patient Medical Summary',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.teal,
+                                ),
                               ),
-                              const Divider(height: 0, thickness: 2),
                             ],
-                          );
-                        }).toList(),
+                          ),
+                          const Divider(
+                            color: Colors.teal,
+                            thickness: 1.5,
+                            height: 20,
+                          ),
+                          ...data.entries.mapIndexed((index, entry) {
+                            final isLast = index == data.length - 1;
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 6.0,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          entry.key.replaceAll('_', ' '),
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black87,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        entry.value.toStringAsFixed(2),
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (!isLast)
+                                  Divider(
+                                    color: Colors.grey.shade400,
+                                    thickness: 1,
+                                    height: 2,
+                                  ),
+                              ],
+                            );
+                          }).toList(),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],

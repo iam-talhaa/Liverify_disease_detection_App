@@ -8,6 +8,8 @@ import 'generative_model_view_model.dart';
 class ChatView extends ConsumerWidget {
   final TextEditingController _controller = TextEditingController();
 
+  ChatView({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final chatMessages = ref.watch(chatProvider);
@@ -28,7 +30,7 @@ class ChatView extends ConsumerWidget {
             ),
           ],
         ),
-        backgroundColor: Colors.teal, // Adjusted color
+        backgroundColor: Colors.teal,
       ),
       body: Container(
         color: whiteColor,
@@ -61,12 +63,7 @@ class ChatView extends ConsumerWidget {
                                 : Colors.deepPurple[100],
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Text(
-                        chatMessages[index],
-                        style: TextStyle(
-                          color: isUserMessage ? Colors.black : Colors.black,
-                        ),
-                      ),
+                      child: buildStyledMessage(chatMessages[index]),
                     ),
                   );
                 },
@@ -82,7 +79,6 @@ class ChatView extends ConsumerWidget {
                       decoration: InputDecoration(
                         prefixIcon: Icon(Icons.chat),
                         filled: true,
-                        //fillColor: LightBlue,
                         fillColor: Colors.grey[200],
                         hintText: 'Type your message here...',
                         border: OutlineInputBorder(
@@ -113,6 +109,115 @@ class ChatView extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  // Main formatter for Gemini's response
+  Widget buildStyledMessage(String message) {
+    if (message.startsWith("You:")) {
+      return Text(message, style: TextStyle(fontSize: 15, color: Colors.black));
+    }
+
+    List<InlineSpan> spans = [];
+    List<String> lines = message.split('\n');
+
+    for (String line in lines) {
+      if (line.trim().isEmpty) {
+        spans.add(TextSpan(text: '\n'));
+        continue;
+      }
+
+      // Headings like ## Treatment
+      if (line.trim().startsWith('##')) {
+        final headingText = line.trim().replaceFirst('##', '').trim();
+        spans.add(
+          TextSpan(
+            text: '$headingText\n\n',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              decoration: TextDecoration.underline,
+              color: Colors.black,
+            ),
+          ),
+        );
+      }
+      // Bullet points like * **Topic:** Description
+      else if (line.trim().startsWith('*') ||
+          line.trim().startsWith('-') ||
+          line.trim().startsWith('•')) {
+        String bulletText =
+            line.trim().replaceFirst(RegExp(r'[*\-•]'), '').trim();
+
+        final RegExp boldPrefix = RegExp(r'^\*\*(.*?):\*\*');
+        final match = boldPrefix.firstMatch(bulletText);
+
+        if (match != null) {
+          String bold = match.group(1)!;
+          String rest = bulletText.replaceFirst(boldPrefix, '').trim();
+
+          spans.add(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: '• ',
+                  style: TextStyle(color: Colors.black, fontSize: 15),
+                ),
+                TextSpan(
+                  text: '$bold: ',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: Colors.black,
+                  ),
+                ),
+                TextSpan(
+                  text: '$rest\n',
+                  style: TextStyle(color: Colors.black, fontSize: 15),
+                ),
+              ],
+            ),
+          );
+        } else {
+          spans.add(
+            TextSpan(
+              text: '• $bulletText\n',
+              style: TextStyle(fontSize: 15, color: Colors.black),
+            ),
+          );
+        }
+      }
+      // Paragraph with possible inline **bold**
+      else {
+        final parts = line.split(RegExp(r'(\*\*[^*]+\*\*)'));
+        for (var part in parts) {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            spans.add(
+              TextSpan(
+                text: part.substring(2, part.length - 2),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: Colors.black,
+                ),
+              ),
+            );
+          } else {
+            spans.add(
+              TextSpan(
+                text: part,
+                style: TextStyle(fontSize: 15, color: Colors.black),
+              ),
+            );
+          }
+        }
+        spans.add(TextSpan(text: '\n\n'));
+      }
+    }
+
+    return RichText(
+      text: TextSpan(children: spans),
+      textAlign: TextAlign.start,
     );
   }
 }
