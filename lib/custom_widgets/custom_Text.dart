@@ -16,10 +16,11 @@ class NormalText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return Text(
       '$t_string',
       style: TextStyle(
+        fontWeight: FontWeight.w400,
+
         fontSize: t_font_size,
         color: t_color,
         fontFamily: t_fontFamily,
