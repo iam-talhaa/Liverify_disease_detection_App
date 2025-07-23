@@ -13,6 +13,7 @@ class HomeScreen_2 extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.green,
           title: Text('Alert Title'),
           content: Text('This is the alert dialog content.'),
           actions: [
