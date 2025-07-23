@@ -27,6 +27,7 @@ class _Liverify_Disease_detectionState
   Widget build(BuildContext context) {
     print("main Screen");
     print("two");
+    print("three");
     return ScreenUtilInit(
       designSize: const Size(360, 690),
       minTextAdapt: true,
