@@ -25,9 +25,7 @@ class _Liverify_Disease_detectionState
     extends State<Liverify_Disease_detection> {
   @override
   Widget build(BuildContext context) {
-    print("main Screen");
-    print("two");
-    print("three");
+    print("Main Screen ");
     return ScreenUtilInit(
       designSize: const Size(360, 690),
       minTextAdapt: true,
