@@ -26,6 +26,7 @@ class _Liverify_Disease_detectionState
   @override
   Widget build(BuildContext context) {
     print("Main Screen ");
+    print("Main Screen ");
     return ScreenUtilInit(
       designSize: const Size(360, 690),
       minTextAdapt: true,
