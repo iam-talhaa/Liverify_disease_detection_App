@@ -76,6 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 B_color: Colors.teal,
                 ontap: () {
                   setState(() {
+                    print("Profile Screen ");
                     name = nameController.text.trim();
                     email = emailController.text.trim();
                   });
