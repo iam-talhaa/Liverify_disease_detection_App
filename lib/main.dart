@@ -25,13 +25,11 @@ class _Liverify_Disease_detectionState
     extends State<Liverify_Disease_detection> {
   @override
   Widget build(BuildContext context) {
-    print("Main Screen ");
-    print("Main Screen ");
     return ScreenUtilInit(
       designSize: const Size(360, 690),
       minTextAdapt: true,
       splitScreenMode: true,
-      // Use builder only if you need to use library outside ScreenUtilInit context
+
       builder: (_, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
