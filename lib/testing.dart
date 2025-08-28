@@ -9,12 +9,14 @@ class MyApp extends StatelessWidget {
 
 class HomeScreen_2 extends StatelessWidget {
   void _showAlertDialog(BuildContext context) {
+    print("Testing Mobile app");
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.green,
-          title: Text('Alert Title'),
+          title: Text('This  is Alert Dialogue Titile'),
           content: Text('This is the alert dialog content.'),
           actions: [
             TextButton(
