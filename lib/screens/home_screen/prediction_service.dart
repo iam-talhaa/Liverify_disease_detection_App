@@ -24,7 +24,9 @@ class PredictionService {
     }
 
     // Load TFLite model
-    final interpreter = await Interpreter.fromAsset('assets/ann_model.tflite');
+    final interpreter = await Interpreter.fromAsset(
+      'assets/hybrid_model.tflite',
+    );
 
     // Normalize input values
     final input = [

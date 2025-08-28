@@ -69,7 +69,7 @@ flutter:
   assets:
     - assets/liver_logo.png
     - assets/ai_icon.png
-    - assets/ann_model.tflite
+    - assets/hybrid_model.tflite
     - assets/ai_icon.png
     - assets/profile.png
     - assets/warning.png
