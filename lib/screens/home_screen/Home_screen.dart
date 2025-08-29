@@ -16,34 +16,61 @@ class _HomeScreenState extends State<HomeScreen> {
   final Map<String, TextEditingController> controllers = {};
   final Map<String, dynamic> inputData = {};
   String result = '';
-  double? _probability; // NEW
+  double? _probability;
 
-  final Map<String, Map<String, dynamic>> fields = {
-    'Age Testing': {'type': TextInputType.number, 'icon': Icons.calendar_today},
-    'Gender': {'type': TextInputType.number, 'icon': Icons.person},
-    'BMI': {'type': TextInputType.number, 'icon': Icons.fitness_center},
+  // Dropdown values
+  String? genderValue;
+  String? smokingValue;
+  String? geneticRiskValue;
+  String? diabetesValue;
+  String? hypertensionValue;
+
+  // Define ranges for validation
+  final Map<String, Map<String, dynamic>> textFields = {
+    'Age Testing': {
+      'type': TextInputType.number,
+      'icon': Icons.calendar_today,
+      'min': 10,
+      'max': 100,
+    },
+    'BMI': {
+      'type': TextInputType.number,
+      'icon': Icons.fitness_center,
+      'min': 10,
+      'max': 50,
+    },
     'AlcoholConsumption': {
       'type': TextInputType.number,
       'icon': Icons.wine_bar,
-    },
-    'Smoking': {'type': TextInputType.number, 'icon': Icons.smoking_rooms},
-    'GeneticRisk': {
-      'type': TextInputType.number,
-      'icon': Icons.family_restroom,
+      'min': 0,
+      'max': 20,
     },
     'PhysicalActivity': {
       'type': TextInputType.number,
       'icon': Icons.directions_run,
+      'min': 0,
+      'max': 10,
     },
-    'Diabetes': {'type': TextInputType.number, 'icon': Icons.bloodtype},
-    'Hypertension': {'type': TextInputType.number, 'icon': Icons.favorite},
-    'LiverFunctionTest': {'type': TextInputType.number, 'icon': Icons.science},
+    'LiverFunctionTest': {
+      'type': TextInputType.number,
+      'icon': Icons.science,
+      'min': null,
+      'max': null,
+    },
+  };
+
+  final Map<String, Map<String, dynamic>> dropdownFields = {
+    'Gender': {'icon': Icons.person},
+    'Smoking': {'icon': Icons.smoking_rooms},
+    'GeneticRisk': {'icon': Icons.family_restroom},
+    'Diabetes': {'icon': Icons.bloodtype},
+    'Hypertension': {'icon': Icons.favorite},
   };
 
   @override
   void initState() {
     super.initState();
-    for (var key in fields.keys) {
+    for (var key in textFields.keys) {
       controllers[key] = TextEditingController();
     }
   }
@@ -68,10 +95,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 66,
                 image:
                     result == "No Disease"
-                        ? AssetImage('assets/check.png')
-                        : AssetImage('assets/warning.png'),
+                        ? const AssetImage('assets/check.png')
+                        : const AssetImage('assets/warning.png'),
               ),
-              SizedBox(width: 5),
+              const SizedBox(width: 5),
               Text(
                 result == "No Disease" ? "Alright" : "Warning",
                 style: TextStyle(
@@ -92,14 +119,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   result == "No Disease"
                       ? "No Liver Disease Detected"
                       : "Non-Alchoholic Fatty Liver Disease Detected",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 if (_probability != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 10),
                     child: Text(
                       'Probability: ${(_probability! * 100).toStringAsFixed(2)}%',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         color: Colors.deepPurple,
                         fontWeight: FontWeight.w600,
@@ -111,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           actions: [
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -126,16 +156,23 @@ class _HomeScreenState extends State<HomeScreen> {
     controllers.forEach((key, controller) {
       controller.clear();
     });
+    setState(() {
+      genderValue = null;
+      smokingValue = null;
+      geneticRiskValue = null;
+      diabetesValue = null;
+      hypertensionValue = null;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffB8CFCE),
+      backgroundColor: const Color(0xffB8CFCE),
       appBar: AppBar(
         title: Row(
           children: [
-            Image(height: 37, image: AssetImage('assets/liver_logo.png')),
+            const Image(height: 37, image: AssetImage('assets/liver_logo.png')),
             Text(
               'Liverify',
               style: TextStyle(
@@ -151,164 +188,429 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Form(
         key: _formKey,
-        child: Padding(
+        child: ListView(
           padding: const EdgeInsets.only(top: 5),
-          child: ListView(
-            children: [
-              ...fields.entries.map(
-                (e) => Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 4,
-                    horizontal: 20,
-                  ),
-                  child: TextFormField(
-                    controller: controllers[e.key],
-                    validator: (myvale) {
-                      if (myvale == null || myvale.isEmpty) {
-                        return "This is Required";
-                      }
-                      return null;
-                    },
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(
-                        e.value['icon'] as IconData,
-                        color: Colors.deepPurple,
-                      ),
-                      filled: true,
-                      fillColor: Color(0xffEAEFEF),
-                      labelStyle: TextStyle(
-                        color: Color(0xff235D2C),
-                        fontWeight: FontWeight.bold,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(color: Colors.teal, width: 2),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(
-                          color: Color(0xff2E6F40),
-                          width: 4,
-                        ),
-                      ),
-                      hintStyle: TextStyle(color: Colors.purple.shade200),
-                      labelText: e.key,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+          children: [
+            // Text input fields with range validation
+            ...textFields.entries.map(
+              (e) => Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 4,
+                  horizontal: 20,
+                ),
+                child: TextFormField(
+                  controller: controllers[e.key],
+                  validator: (myValue) {
+                    if (myValue == null || myValue.isEmpty) {
+                      return "This is Required";
+                    }
+                    final value = double.tryParse(myValue);
+                    if (value == null) return "Enter a valid number";
+
+                    final min = e.value['min'];
+                    final max = e.value['max'];
+                    if (min != null && value < min) {
+                      return "Value must be ≥ $min";
+                    }
+                    if (max != null && value > max) {
+                      return "Value must be ≤ $max";
+                    }
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(
+                      e.value['icon'] as IconData,
+                      color: Colors.deepPurple,
+                    ),
+                    filled: true,
+                    fillColor: const Color(0xffEAEFEF),
+                    labelStyle: const TextStyle(
+                      color: Color(0xff235D2C),
+                      fontWeight: FontWeight.bold,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(
+                        color: Colors.teal,
+                        width: 2,
                       ),
                     ),
-                    keyboardType: e.value['type'],
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(
+                        color: Color(0xff2E6F40),
+                        width: 4,
+                      ),
+                    ),
+                    labelText: e.key,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
+                  keyboardType: e.value['type'],
                 ),
               ),
-              SizedBox(height: 5),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: C_button(
-                  name: "Detect",
-                  B_color: Colors.teal,
-                  ontap: () async {
-                    if (_formKey.currentState!.validate()) {
-                      inputData.clear();
-                      controllers.forEach((key, controller) {
-                        inputData[key] =
-                            double.tryParse(controller.text.trim()) ?? 0.0;
-                      });
+            ),
 
-                      final prediction = await PredictionService().predict(
-                        inputData,
-                      );
+            // Dropdowns
+            _buildGenderDropdownField('Gender', genderValue, (value) {
+              setState(() => genderValue = value);
+            }, Icons.person),
+            _buildDropdownField('Smoking', smokingValue, (value) {
+              setState(() => smokingValue = value);
+            }, Icons.smoking_rooms),
+            _buildDropdownField('GeneticRisk', geneticRiskValue, (value) {
+              setState(() => geneticRiskValue = value);
+            }, Icons.family_restroom),
+            _buildDropdownField('Diabetes', diabetesValue, (value) {
+              setState(() => diabetesValue = value);
+            }, Icons.bloodtype),
+            _buildDropdownField('Hypertension', hypertensionValue, (value) {
+              setState(() => hypertensionValue = value);
+            }, Icons.favorite),
 
-                      setState(() {
-                        result =
-                            prediction > 0.5
-                                ? 'Disease Detected'
-                                : 'No Disease';
-                        _probability = prediction;
-                        _showAlertDialog(context);
-                      });
+            const SizedBox(height: 5),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: C_button(
+                name: "Detect",
+                B_color: Colors.teal,
+                ontap: () async {
+                  if (_formKey.currentState!.validate()) {
+                    inputData.clear();
 
-                      _clearAllFields();
-                    }
-                  },
-                  b_Width: 100.0.w,
-                  b_height: 45.0.h,
-                ),
+                    // Collect text field values
+                    controllers.forEach((key, controller) {
+                      inputData[key] =
+                          double.tryParse(controller.text.trim()) ?? 0.0;
+                    });
+
+                    // Collect dropdowns
+                    inputData['Gender'] = genderValue == 'Male [0]' ? 0.0 : 1.0;
+                    inputData['Smoking'] = smokingValue == 'Yes' ? 1.0 : 0.0;
+                    inputData['GeneticRisk'] =
+                        geneticRiskValue == 'Yes' ? 1.0 : 0.0;
+                    inputData['Diabetes'] = diabetesValue == 'Yes' ? 1.0 : 0.0;
+                    inputData['Hypertension'] =
+                        hypertensionValue == 'Yes' ? 1.0 : 0.0;
+
+                    final prediction = await PredictionService().predict(
+                      inputData,
+                    );
+                    print("Final Input data :$inputData ");
+
+                    setState(() {
+                      result =
+                          prediction > 0.5 ? 'Disease Detected' : 'No Disease';
+                      _probability = prediction;
+                      _showAlertDialog(context);
+                    });
+
+                    _clearAllFields();
+                  }
+                },
+                b_Width: 100.0.w,
+                b_height: 45.0.h,
               ),
-              SizedBox(height: 10),
-              Center(
-                child:
-                    result == ''
-                        ? null
-                        : Container(
-                          height: 140.h,
-                          width: double.infinity,
-                          decoration: BoxDecoration(color: LightBlue),
-                          child: Row(
-                            children: [
-                              SizedBox(width: 10),
-                              Image(
-                                height: 80,
-                                image: AssetImage(
-                                  result == 'Disease Detected'
-                                      ? 'assets/warning.png'
-                                      : 'assets/check.png',
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      result == 'Disease Detected'
-                                          ? "Non-Alcholic-Fatty\nLiver Disease Detected"
-                                          : "No Liver Disease",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 17,
-                                      ),
-                                    ),
-                                    if (_probability != null) ...[
-                                      SizedBox(height: 8),
-                                      Text(
-                                        'Probability: ${(_probability! * 100).toStringAsFixed(2)}%',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.deepPurple,
-                                        ),
-                                      ),
-                                      SizedBox(height: 6),
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: LinearProgressIndicator(
-                                          minHeight: 10,
-                                          value: _probability!,
-                                          backgroundColor: Colors.grey.shade300,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                _probability! > 0.7
-                                                    ? Colors.red
-                                                    : _probability! > 0.3
-                                                    ? Colors.orange
-                                                    : Colors.green,
-                                              ),
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                            ],
-                          ),
-                        ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  // Your _buildDropdownField and _buildGenderDropdownField stay same...
+  // (No changes needed except keeping them as before)
+  Widget _buildDropdownField(
+    String fieldName,
+    String? currentValue,
+    Function(String?) onChanged,
+    IconData icon,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 20),
+      child: DropdownButtonFormField<String>(
+        value: currentValue,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return "This is Required";
+          }
+          return null;
+        },
+        decoration: InputDecoration(
+          prefixIcon: Icon(icon, color: Colors.deepPurple, size: 24),
+          suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal, size: 28),
+          filled: true,
+          fillColor: Color(0xffEAEFEF),
+          labelStyle: TextStyle(
+            color: Color(0xff235D2C),
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Colors.teal, width: 2),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Color(0xff2E6F40), width: 4),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Colors.red, width: 2),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Colors.red, width: 3),
+          ),
+          labelText: fieldName,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+        items: [
+          DropdownMenuItem<String>(
+            value: 'Yes',
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  colors: [Colors.green.shade50, Colors.green.shade100],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.check_circle,
+                    color: Colors.green.shade600,
+                    size: 20,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    'Yes',
+                    style: TextStyle(
+                      color: Colors.green.shade700,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          DropdownMenuItem<String>(
+            value: 'No',
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  colors: [Colors.red.shade50, Colors.red.shade100],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.cancel, color: Colors.red.shade600, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'No',
+                    style: TextStyle(
+                      color: Colors.red.shade700,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+        onChanged: onChanged,
+        dropdownColor: Color(0xffF5F8F8),
+        borderRadius: BorderRadius.circular(15),
+        elevation: 8,
+        iconSize: 0, // Hide default icon since we're using custom suffixIcon
+        style: TextStyle(
+          color: Color(0xff235D2C),
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+        ),
+        selectedItemBuilder: (BuildContext context) {
+          return ['Yes', 'No'].map<Widget>((String value) {
+            return Container(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                children: [
+                  Icon(
+                    value == 'Yes' ? Icons.check_circle : Icons.cancel,
+                    color:
+                        value == 'Yes'
+                            ? Colors.green.shade600
+                            : Colors.red.shade600,
+                    size: 18,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    value,
+                    style: TextStyle(
+                      color: Color(0xff235D2C),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList();
+        },
+      ),
+    );
+  }
+
+  Widget _buildGenderDropdownField(
+    String fieldName,
+    String? currentValue,
+    Function(String?) onChanged,
+    IconData icon,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 20),
+      child: DropdownButtonFormField<String>(
+        value: currentValue,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return "This is Required";
+          }
+          return null;
+        },
+        decoration: InputDecoration(
+          prefixIcon: Icon(icon, color: Colors.deepPurple, size: 24),
+          suffixIcon: Icon(Icons.arrow_drop_down, color: Colors.teal, size: 28),
+          filled: true,
+          fillColor: Color(0xffEAEFEF),
+          labelStyle: TextStyle(
+            color: Color(0xff235D2C),
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Colors.teal, width: 2),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Color(0xff2E6F40), width: 4),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Colors.red, width: 2),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Colors.red, width: 3),
+          ),
+          labelText: fieldName,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+        items: [
+          DropdownMenuItem<String>(
+            value: 'Male [0]',
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  colors: [Colors.blue.shade50, Colors.blue.shade100],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.male, color: Colors.blue.shade600, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'Male [0]',
+                    style: TextStyle(
+                      color: Colors.blue.shade700,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          DropdownMenuItem<String>(
+            value: 'Female [1]',
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  colors: [Colors.pink.shade50, Colors.pink.shade100],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.female, color: Colors.pink.shade600, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'Female [1]',
+                    style: TextStyle(
+                      color: Colors.pink.shade700,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+        onChanged: onChanged,
+        dropdownColor: Color(0xffF5F8F8),
+        borderRadius: BorderRadius.circular(15),
+        elevation: 8,
+        iconSize: 0, // Hide default icon since we're using custom suffixIcon
+        style: TextStyle(
+          color: Color(0xff235D2C),
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+        ),
+        selectedItemBuilder: (BuildContext context) {
+          return ['Male [0]', 'Female [1]'].map<Widget>((String value) {
+            return Container(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                children: [
+                  Icon(
+                    value.contains('Male') ? Icons.male : Icons.female,
+                    color:
+                        value.contains('Male')
+                            ? Colors.blue.shade600
+                            : Colors.pink.shade600,
+                    size: 18,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    value,
+                    style: TextStyle(
+                      color: Color(0xff235D2C),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList();
+        },
       ),
     );
   }
